@@ -1,14 +1,14 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, UserRole } from "../../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("patient");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -26,16 +26,16 @@ const LoginForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await login(email, password, role);
+      await login(email, password);
       toast({
         title: "Welcome back!",
         description: "You've successfully logged in.",
       });
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
     } finally {
@@ -51,31 +51,6 @@ const LoginForm: React.FC = () => {
           <p className="text-medical-darkGray mt-2">Sign in to your account</p>
         </div>
 
-        <div className="flex rounded-xl overflow-hidden border border-gray-200 mb-6">
-          <button
-            type="button"
-            onClick={() => setRole("patient")}
-            className={`flex-1 py-3 text-center transition-all ${
-              role === "patient"
-                ? "bg-medical-blue text-white"
-                : "bg-white text-gray-500"
-            }`}
-          >
-            Patient
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole("doctor")}
-            className={`flex-1 py-3 text-center transition-all ${
-              role === "doctor"
-                ? "bg-medical-blue text-white"
-                : "bg-white text-gray-500"
-            }`}
-          >
-            Doctor
-          </button>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -86,7 +61,7 @@ const LoginForm: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={`Enter your email`}
+              placeholder="Enter your email"
               className="medical-input"
               disabled={isSubmitting}
             />
@@ -119,7 +94,7 @@ const LoginForm: React.FC = () => {
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Signing in...
               </div>
             ) : (

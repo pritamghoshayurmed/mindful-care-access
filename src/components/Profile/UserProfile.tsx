@@ -7,16 +7,24 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 
 const UserProfile: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { profile, logout } = useAuth();
   const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const menuItems = [
@@ -62,15 +70,15 @@ const UserProfile: React.FC = () => {
       <div className="medical-card p-6 flex flex-col items-center">
         <div className="h-24 w-24 rounded-full overflow-hidden border-4 border-medical-lightBlue mb-4">
           <img
-            src={user?.profilePicture}
-            alt={user?.name}
+            src={profile?.profile_picture || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=300&auto=format&fit=crop"}
+            alt={profile?.full_name}
             className="h-full w-full object-cover"
           />
         </div>
-        <h2 className="text-xl font-semibold">{user?.name}</h2>
-        <p className="text-medical-darkGray mb-2">{user?.email}</p>
+        <h2 className="text-xl font-semibold">{profile?.full_name}</h2>
+        <p className="text-medical-darkGray mb-2">{profile?.id}</p>
         <span className="px-3 py-1 bg-medical-lightBlue text-medical-blue text-xs rounded-full capitalize">
-          {user?.role}
+          {profile?.role}
         </span>
       </div>
 

@@ -1,9 +1,10 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, UserRole } from "../../contexts/AuthContext";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const RegisterForm: React.FC = () => {
   const [name, setName] = useState("");
@@ -30,13 +31,13 @@ const RegisterForm: React.FC = () => {
       await register(name, email, password, role);
       toast({
         title: "Account created!",
-        description: "You have successfully registered.",
+        description: "You have successfully registered. Please check your email to confirm your account.",
       });
-      navigate("/dashboard");
-    } catch (error) {
+      navigate("/login");
+    } catch (error: any) {
       toast({
         title: "Registration failed",
-        description: "An error occurred during registration.",
+        description: error.message || "An error occurred during registration.",
         variant: "destructive",
       });
     } finally {
@@ -130,7 +131,7 @@ const RegisterForm: React.FC = () => {
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Creating account...
               </div>
             ) : (

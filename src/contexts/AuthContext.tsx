@@ -1,74 +1,111 @@
 
 import React, { createContext, useState, useEffect, useContext } from "react";
+import { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 export type UserRole = "doctor" | "patient";
 
-export interface User {
+export interface UserProfile {
   id: string;
-  name: string;
-  email: string;
+  full_name: string;
   role: UserRole;
-  profilePicture?: string;
+  profile_picture?: string;
 }
 
 interface AuthContextType {
   user: User | null;
+  profile: UserProfile | null;
+  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Mock users for demonstration
-const MOCK_USERS: User[] = [
-  { 
-    id: "1", 
-    name: "Dr. Sarah Johnson", 
-    email: "doctor@example.com", 
-    role: "doctor", 
-    profilePicture: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=300&auto=format&fit=crop"
-  },
-  { 
-    id: "2", 
-    name: "John Smith", 
-    email: "patient@example.com", 
-    role: "patient", 
-    profilePicture: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=300&auto=format&fit=crop"
-  }
-];
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    // Check for existing session in localStorage
-    const storedUser = localStorage.getItem("medicalAppUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
-  }, []);
-
-  const login = async (email: string, password: string, role: UserRole) => {
-    setIsLoading(true);
+  // Fetch user profile from Supabase
+  const fetchUserProfile = async (userId: string) => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
+
+      return data as UserProfile;
+    } catch (error) {
+      console.error('Error in fetchUserProfile:', error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Fetch profile when auth state changes
+        if (session?.user) {
+          setTimeout(() => {
+            fetchUserProfile(session.user.id).then(profile => {
+              setProfile(profile);
+            });
+          }, 0);
+        } else {
+          setProfile(null);
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
       
-      const foundUser = MOCK_USERS.find(u => u.email === email && u.role === role);
-      
-      if (!foundUser) {
-        throw new Error("Invalid credentials or user not found");
+      if (session?.user) {
+        fetchUserProfile(session.user.id).then(profile => {
+          setProfile(profile);
+        });
       }
       
-      // Store user in localStorage for persistence
-      localStorage.setItem("medicalAppUser", JSON.stringify(foundUser));
-      setUser(foundUser);
-    } catch (error) {
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      
+      if (data.user) {
+        const profile = await fetchUserProfile(data.user.id);
+        setProfile(profile);
+      }
+      
+    } catch (error: any) {
       console.error("Login error:", error);
       throw error;
     } finally {
@@ -79,24 +116,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string, role: UserRole) => {
     setIsLoading(true);
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a new user
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        name,
+      const { data, error } = await supabase.auth.signUp({
         email,
-        role,
-        profilePicture: role === "doctor" 
-          ? "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=300&auto=format&fit=crop" 
-          : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=300&auto=format&fit=crop"
-      };
+        password,
+        options: {
+          data: {
+            full_name: name,
+            role,
+          },
+        }
+      });
+
+      if (error) throw error;
       
-      // Store user in localStorage for persistence
-      localStorage.setItem("medicalAppUser", JSON.stringify(newUser));
-      setUser(newUser);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
       throw error;
     } finally {
@@ -104,16 +137,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("medicalAppUser");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      throw error;
+    }
   };
 
   return (
     <AuthContext.Provider 
       value={{ 
         user, 
-        isAuthenticated: !!user, 
+        profile,
+        session,
+        isAuthenticated: !!session, 
         isLoading, 
         login, 
         register, 
