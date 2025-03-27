@@ -1,10 +1,11 @@
+
 import React from "react";
 import { Calendar, Clock, User, Clipboard, MessageSquare, Bell, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 
 const DoctorDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { profile } = useAuth();
   const currentDate = new Date();
   const formattedDate = new Intl.DateTimeFormat('en-US', { 
     weekday: 'long', 
@@ -36,15 +37,15 @@ const DoctorDashboard: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-xl font-semibold text-medical-black">
-            Hello, Dr. {user?.name?.split(' ')[1]}
+            Hello, Dr. {profile?.full_name?.split(' ')[1] || 'Doctor'}
           </h1>
           <p className="text-medical-darkGray text-sm">{formattedDate}</p>
         </div>
         <Link to="/profile">
           <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-medical-blue">
             <img 
-              src={user?.profilePicture || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=300&auto=format&fit=crop"} 
-              alt={user?.name || "Doctor"}
+              src={profile?.profile_picture || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=300&auto=format&fit=crop"} 
+              alt={profile?.full_name || "Doctor"}
               className="h-full w-full object-cover"
             />
           </div>
