@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusIcon, ArrowRight } from "lucide-react";
+import { PlusIcon, ArrowRight, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Welcome: React.FC = () => {
@@ -37,6 +37,15 @@ const Welcome: React.FC = () => {
             onClick={() => navigate("/register")}
           >
             Create Account
+          </Button>
+
+          <Button 
+            variant="ghost" 
+            className="w-full h-12 flex items-center justify-center gap-2 text-medical-blue"
+            onClick={() => navigate("/ai-chat")}
+          >
+            <MessageSquareText size={18} />
+            AI Health Assistant
           </Button>
         </div>
       </div>
