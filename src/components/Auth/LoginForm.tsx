@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, UserRole } from "../../contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Motion, spring } from "react-motion"; 
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");

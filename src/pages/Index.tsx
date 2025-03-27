@@ -1,17 +1,10 @@
 
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Splash from '@/components/Splash';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 
 const Index: React.FC = () => {
-  const navigate = useNavigate();
-
-  // Redirect to splash screen
-  useEffect(() => {
-    navigate('/splash');
-  }, [navigate]);
-
-  return <Splash />;
+  // Use Navigate component instead of useNavigate hook
+  return <Navigate to="/splash" replace />;
 };
 
 export default Index;

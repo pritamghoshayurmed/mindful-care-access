@@ -28,7 +28,7 @@ const Welcome: React.FC = () => {
             onClick={() => navigate("/login")}
           >
             Sign In
-            <ArrowRight size={18} />
+            <ArrowRight size={18} className="ml-2" />
           </Button>
           
           <Button 

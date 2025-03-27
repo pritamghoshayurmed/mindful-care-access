@@ -9,16 +9,19 @@ const Splash: React.FC = () => {
 
   useEffect(() => {
     // Show the plus icon with delay for animation
-    setTimeout(() => {
+    const plusIconTimer = setTimeout(() => {
       setShowPlusIcon(true);
     }, 500);
 
     // Navigate to welcome screen after 2.5 seconds
-    const timer = setTimeout(() => {
+    const navigationTimer = setTimeout(() => {
       navigate("/welcome");
     }, 2500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(plusIconTimer);
+      clearTimeout(navigationTimer);
+    };
   }, [navigate]);
 
   return (
