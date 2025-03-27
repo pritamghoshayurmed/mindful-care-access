@@ -1,17 +1,17 @@
 
 import React from 'react';
 import Layout from '@/components/Layout/Layout';
-import AIChatInterface from '@/components/Chat/AIChatInterface';
+import AIChat from '@/components/Chat/AIChat';
 import { useAuth } from '@/contexts/AuthContext';
 
-const AIChat: React.FC = () => {
+const AIChatPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   
   return (
     <Layout>
-      <AIChatInterface />
+      <AIChat />
     </Layout>
   );
 };
 
-export default AIChat;
+export default AIChatPage;

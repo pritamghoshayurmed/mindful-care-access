@@ -58,9 +58,10 @@ export default {
           foreground: 'hsl(var(--card-foreground))',
         },
         medical: {
-          blue: '#0066FF',
-          lightBlue: '#E5F0FF',
-          gray: '#F6F8FC',
+          green: '#16A34A',
+          lightGreen: '#DCFCE7',
+          darkGreen: '#166534',
+          gray: '#F7F9F8',
           darkGray: '#667085',
           black: '#101828',
         },

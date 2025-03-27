@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusIcon, ArrowRight, MessageSquareText } from "lucide-react";
+import { Leaf, ArrowRight, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Welcome: React.FC = () => {
@@ -10,12 +10,12 @@ const Welcome: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-4 animate-fade-in">
-        <div className="flex items-center justify-center h-20 w-20 rounded-2xl bg-medical-blue mb-12">
-          <PlusIcon className="text-white" size={32} strokeWidth={2.5} />
+        <div className="flex items-center justify-center h-20 w-20 rounded-2xl bg-medical-green mb-12">
+          <Leaf className="text-white" size={32} strokeWidth={2.5} />
         </div>
 
         <h1 className="text-3xl font-semibold text-center text-medical-black mb-4">
-          Welcome to MindfulCare
+          Welcome to Kabiraj
         </h1>
         
         <p className="text-center text-gray-500 max-w-xs mb-12">
@@ -41,7 +41,7 @@ const Welcome: React.FC = () => {
 
           <Button 
             variant="ghost" 
-            className="w-full h-12 flex items-center justify-center gap-2 text-medical-blue"
+            className="w-full h-12 flex items-center justify-center gap-2 text-medical-green"
             onClick={() => navigate("/ai-chat")}
           >
             <MessageSquareText size={18} />
