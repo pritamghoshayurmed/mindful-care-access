@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Calendar, Clock, User, Users, MessageSquare, Bell } from "lucide-react";
+import { Calendar, Clock, User, Users, MessageSquare, Bell, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 
