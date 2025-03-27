@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Calendar, Clock, User, Users, MessageSquare, Bell, ArrowRight } from "lucide-react";
+import { Calendar, Clock, User, Users, MessageSquare, Bell, ArrowRight, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 
@@ -63,11 +63,11 @@ const PatientDashboard: React.FC = () => {
           </div>
           <span className="text-xs text-medical-darkGray text-center">Messages</span>
         </Link>
-        <Link to="/notifications" className="flex flex-col items-center">
+        <Link to="/ai-chat" className="flex flex-col items-center">
           <div className="h-14 w-14 rounded-xl bg-medical-lightBlue flex items-center justify-center mb-2">
-            <Bell className="h-6 w-6 text-medical-blue" />
+            <MessageCircle className="h-6 w-6 text-medical-blue" />
           </div>
-          <span className="text-xs text-medical-darkGray text-center">Notifications</span>
+          <span className="text-xs text-medical-darkGray text-center">AI Chat</span>
         </Link>
       </div>
 

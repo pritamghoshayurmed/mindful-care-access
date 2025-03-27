@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -9,12 +9,15 @@ import { toast } from '@/hooks/use-toast';
 const ScheduleAppointment: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isDoctor = user?.role === 'doctor';
   
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<number | null>(null);
+  const [diagnosisReport, setDiagnosisReport] = useState<string>('');
   
   // Sample doctors for patient to select
   const doctors = [
@@ -31,10 +34,22 @@ const ScheduleAppointment: React.FC = () => {
       specialty: "Dermatologist",
       image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=300&auto=format&fit=crop",
       selected: false
+    },
+    {
+      id: 3,
+      name: "Dr. Emma Wilson",
+      specialty: "Neurologist",
+      image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=300&auto=format&fit=crop",
+      selected: false
+    },
+    {
+      id: 4,
+      name: "Dr. James Miller",
+      specialty: "Orthopedic",
+      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=300&auto=format&fit=crop",
+      selected: false
     }
   ];
-  
-  const [selectedDoctor, setSelectedDoctor] = useState<number | null>(null);
   
   // Available time slots
   const timeSlots = [
@@ -42,6 +57,26 @@ const ScheduleAppointment: React.FC = () => {
     "11:00 AM", "11:30 AM", "01:00 PM", "01:30 PM",
     "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM"
   ];
+  
+  // Check if a doctor was selected from the AI chat
+  useEffect(() => {
+    const preselectedDoctor = localStorage.getItem('selectedDoctor');
+    if (preselectedDoctor) {
+      const doctorData = JSON.parse(preselectedDoctor);
+      setSelectedDoctor(doctorData.id);
+      
+      // Clear the localStorage after using it
+      localStorage.removeItem('selectedDoctor');
+      
+      // If we have a diagnosis, use it
+      const diagnosis = localStorage.getItem('aiDiagnosis');
+      if (diagnosis) {
+        setReason(diagnosis);
+        setDiagnosisReport(diagnosis);
+        localStorage.removeItem('aiDiagnosis');
+      }
+    }
+  }, []);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,6 +213,13 @@ const ScheduleAppointment: React.FC = () => {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             ></textarea>
+            
+            {diagnosisReport && (
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs text-blue-700 mb-1 font-medium">AI Diagnosis Report</p>
+                <p className="text-sm">{diagnosisReport}</p>
+              </div>
+            )}
           </div>
         )}
         
